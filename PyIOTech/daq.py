@@ -3,10 +3,9 @@ from __future__ import print_function, absolute_import, division, unicode_litera
 import ctypes as ct
 from ctypes import wintypes as wt
 from ctypes.util import find_library
-from . import daqh
 
 #initialize Daqx.dll
-dll = find_library('daqx')
+dll = find_library('daqx64')
 #print("Dll = ", dll)
 daq = ct.OleDLL(dll)
 
@@ -758,4 +757,4 @@ class daqDevice(object):
 
 if __name__ == '__main__':
     print(GetDeviceList())
-    dev = daqDevice(b'DaqBoard2K0')
+    dev = daqDevice(b'DaqBoard3K0')

@@ -1,2 +1,4 @@
 *.py[co]
 
+# ide stuff 
+.idea/*
