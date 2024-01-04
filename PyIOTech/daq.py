@@ -5,8 +5,11 @@ import time
 from ctypes import wintypes as wt
 from ctypes.util import find_library
 
+from .daqh import DatsImmediate
+
 # initialize Daqx.dll
 dll = find_library('daqx64')
+print(dll)
 # print("Dll = ", dll)
 daq = ct.OleDLL(dll)
 
@@ -104,7 +107,6 @@ class DaqError(Exception):
 
 def FormatError(errNum):
     """Returns the text-string equivalent for the specified error condition code"""
-
     msg = (ct.c_char * 64)()  # Messages at minimum is 64 characters
 
     daq.daqFormatError(errNum, ct.byref(msg))
@@ -445,7 +447,7 @@ class daqDevice(object):
 
         # Allow values to be converted through one call of the function
         # Or just return the value from the daqboard
-        if convert == None:
+        if convert is None:
             sample = sample.value
         else:
             sample = convert(sample.value)
@@ -471,7 +473,33 @@ class daqDevice(object):
         vals = []
         # Convert return values using a function passed to convert
         # or just return the bit values from the daqboard
-        if convert == None:
+        if convert is None:
+            vals = list(buf)
+        else:
+            vals = list(map(convert, buf))
+
+        return vals
+
+    def AdcRdScanN(self, startChan, endChan, scanCount, scanRate: float, gain, flags, convert=None):
+        """daqAdcRdScanN reads multiple scans from a set of consecutive acquisition channels.
+        Begins taking post trigger scans immediately upon AdcArm function"""
+
+        scanRate = wt.FLOAT(scanRate)
+        # Buffer length is always the number of channels
+        bufLength = (endChan - startChan + 1) * scanCount
+        buf = (wt.WORD * bufLength)()
+        pbuf = ct.pointer(buf)
+
+        err = daq.daqAdcRdScanN(self.handle, startChan, endChan, pbuf, scanCount, DatsImmediate, False, 0, scanRate,
+                                gain, flags)
+
+        if err != 0:
+            raise DaqError(err)
+
+        vals = []
+        # Convert return values using a function passed to convert
+        # or just return the bit values from the daqboard
+        if convert is None:
             vals = list(buf)
         else:
             vals = list(map(convert, buf))
@@ -632,11 +660,10 @@ class daqDevice(object):
 
     def IOWrite(self, devType, devPort, whichDevice, whichExpPort, value):
 
-        whichDevice = wt.DWORD(whichDevice)
-        value = wt.DWORD(value)
-        valuePtr = ct.pointer(value)
+        # valuePtr = ct.pointer(value) The documentation says this is a pointer. It's lying, its a value that it reads
+        # from the stack.
 
-        err = daq.daqIOWrite(self.handle, devType, devPort, whichDevice, whichExpPort, valuePtr)
+        err = daq.daqIOWrite(self.handle, devType, devPort, whichDevice, whichExpPort, value)
         if err != 0:
             raise DaqError(err)
 
@@ -825,15 +852,11 @@ if __name__ == '__main__':
 
         config = dev.IOGet8255Conf(0, 0, 0, 0)
         print(config)
-        results = []
-        for a in range(0, 20):
-            for b in range(0, 20):
-                try:
-                    dev.IOWrite(a, b, 0, 0, config)
-                    results.append((a, b))
-                except:
-                    pass
-        print(results)
+        dev.IOWrite(1, 3, 0, 1, config)
+        val = 255
+        dev.IOWrite(1, 0, 0, 1, val)
+        dev.IOWrite(1, 1, 0, 1, val)
+        dev.IOWrite(1, 2, 0, 1, val)
     except DaqError as e:
         print(e.errcode)
         print(e.msg)

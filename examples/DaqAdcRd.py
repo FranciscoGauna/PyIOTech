@@ -5,7 +5,7 @@ from PyIOTech import daq, daqh
 # Device name as registered with the Windows driver.
 device_name = b'DaqBoard3K0'
 # Input channel number.
-channel = 0
+channel = 5
 # Programmable amplifier with gain of 1.
 gain = daqh.DgainX1
 # Bipolar-voltage differential input, unsigned-integer readout.
