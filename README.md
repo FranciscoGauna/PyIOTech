@@ -1,7 +1,7 @@
 PyIOTech
 ========
 
-Python wrapper for IOTech/Measurement-Computing data-acquisition devices.
+Python wrapper for IOTech/Measurement-Computing data-acquisition devices. Updated to use 64-bit dll.
 
 Keywords: DaqBoard, DaqBook, DaqLab, DaqScan, Personal Daq, TempBook, WaveBook.
 <br>
@@ -42,9 +42,10 @@ There is no official documentation for PyIOTech, however the python function-sig
 
 ## Installation ##
 
-This is a pure python distribution with no external dependencies (except the IOTech device driver "daqx.dll"). Tested with python 2.7 and 3.4.
+This is a pure python distribution with no external dependencies (except the IOTech device driver "daqx64.dll"). Tested with python 3.11 64 bits.
+You can find the external dll at the [Diligent Software FTP server.](https://files.digilent.com/#downloads/iotech_software/DaqBoard_3000_Series_PCI_USB/)
 
-To install, run: `$ python setup.py install`
+To install, run: `$ pip install git+https://github.com/FranciscoGauna/PyIOTech`
 
 
 ## Credits ##
