@@ -1,13 +1,14 @@
 """Read multiple ADC samples from multiple input channels."""
 from __future__ import print_function, division
+
 from PyIOTech import daq, daqh
 from PyIOTech.daq import DaqError
 
 # Device name as registered with the Windows driver.
 device_name = b'DaqBoard3K0'
 # Input channel numbers.
-first_channel = 12
-last_channel = 13
+first_channel = 5
+last_channel = 5
 # Programmable amplifier with gain of 1.
 gain = daqh.DgainX1
 # Bipolar-voltage differential input, unsigned-integer readout.
@@ -24,10 +25,10 @@ bit_depth = 16
 dev = daq.daqDevice(device_name)
 try:
     # Connect to the device.
-    # Read one sample.
-    data = dev.AdcRdScanN(first_channel, last_channel, 1000, 1000.0, gain, flags)
-    # Convert sample from unsigned integer value to bipolar voltage.
-    print(data)
+    # Read 500 samples.
+    data = dev.AdcRdScanN(first_channel, last_channel, 500, 5000.0, gain, flags)
+    # Convert samples from unsigned integer value to bipolar voltage.
+    data = list(map(lambda x: x*max_voltage*2/(2**bit_depth) - max_voltage, data))
 except DaqError as e:
     print(e.msg)
     print(e.errcode)

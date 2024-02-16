@@ -9,7 +9,6 @@ from .daqh import DatsImmediate
 
 # initialize Daqx.dll
 dll = find_library('daqx64')
-print(dll)
 # print("Dll = ", dll)
 daq = ct.OleDLL(dll)
 
